@@ -1,0 +1,20 @@
+{
+  "name": "nginx",
+  "version": "0.0.1",
+  "author": "Matteo Abis",
+  "license": "Licensed under (Apache 2.0)",
+  "summary": "Slim nginx config generator",
+  "source": "https://github.com/Enucatl/pp-nginx",
+  "project_page": "(https://github.com/Enucatl/pp-nginx)",
+  "issues_url": "https://github.com/Enucatl/pp-nginx/issues",
+  "tags": ["nginx"],
+  "operatingsystem_support": [
+    {
+    "operatingsystem": "Ubuntu",
+    "operatingsystemrelease": [ "14.04"]
+    }
+   ],
+  "dependencies": [
+    { "name": "puppetlabs/stdlib" }
+  ]
+}
