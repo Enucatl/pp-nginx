@@ -1,4 +1,4 @@
-define nginx::server (
+define nginx::upstream (
   $ensure = present,
   $server_config_header_template = "nginx/conf.d/upstream_header.conf.erb",
   $server_config_footer_template = "nginx/conf.d/upstream_footer.conf.erb",
