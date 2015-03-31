@@ -6,7 +6,7 @@ A very slim nginx module for puppet.
 * Build-Status: [![Build Status](https://travis-ci.org/DracoBlue/pp-nginx.png?branch=master)](https://travis-ci.org/DracoBlue/pp-nginx)
 * Official Site: http://dracoblue.net/
 
-pp-ningx is copyright 2014 by DracoBlue http://dracoblue.net
+pp-ningx is copyright 2014-2015 by DracoBlue http://dracoblue.net
 
 # Installation
 
@@ -69,7 +69,6 @@ There are only 3 classes in this puppet module.
 * private
   * `include nginx::package`: is loaded by the `nginx` class, to ensure that the nginx package is available on the operating system
   * `include nginx::service`: is loaded by the `nginx` class, to ensure that the nginx service control is available
-  * `include nginx::base`: is used by `nginx::server::location` and `nginx::server` to ensure that the server is reloaded on file changes
 
 ## Types
 
@@ -133,14 +132,14 @@ before the `allow` rules, use two `access` definitions (like in `tests/access-lo
 
 See `tests/access-location.example.org.pp` for more examples.
 
-### `nginx::server::location::auth-basic`
+### `nginx::server::location::auth_basic`
 
 Adds `auth_basic` and `auth_basic_user_file` definitions to a given `$location`.
 
 Be sure that nginx can access the absolute path given to in `$user_file`. The `$text` must not contain quotation marks (").
 
 ``` ruby
-nginx::server::location::auth-basic { "assets-directory":
+nginx::server::location::auth_basic { "assets-directory":
   location => Nginx::Server::Location['assets'],
   text => 'This is restricted',
   user_file => '/etc/nginx/.htpasswd'
@@ -180,6 +179,29 @@ define nginx::server::location::access (
 }
 ```
 
+## Templates
+
+This area will contain some templates, which are frequently used. They are available in the `manifests/templates/` folder.
+
+### `nginx::templates::www_rewrite_http_server`
+
+Redirect a given domain from `www.example.org` to `example.org` with an own nginx server entry.
+
+``` puppet
+nginx::templates::www_rewrite_http_server { "example-www-redirect":
+  server_name => "example.org",
+}
+```
+
+Will generate:
+``` text
+server {
+    listen 80;
+    server_name www.example.org;
+    rewrite ^(.*) http://example.org$1 permanent;
+}
+```
+
 # Run tests
 
 ``` console
@@ -190,6 +212,15 @@ Hint: The tests will need sudo rights and will write into /tmp/pp-nginx-results.
 
 # Changelog
 
+* 2.0.0 (2015/02/02)
+  - removed symlink from tests folder (because they are not supported in packages)
+  - [BC] removed unused `nginx::base` class
+  - added puppet lint and puppet parser validate to travis tests
+  - fixed line indention and some other things to make puppet-lint happy #17
+  - [BC] renamed `nginx::server::location::auth-basic` to `nginx::server::location::auth_basic` for puppet 4.0 compatibility
+  - added template `nginx::templates::www_rewrite_http_server` for redirect of e.g. `www.example.org` to `example.org`
+* 1.3.1 (2015/01/31)
+  - fixed recursive symlinks in test folder
 * 1.3.0 (2014/05/18)
   - added message if no proper `$server` is given to location (e.g. if `server_config_file_name` parameter is missing) refs #11
   - tests use a specific facter version now refs #14
