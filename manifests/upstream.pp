@@ -9,8 +9,6 @@ define nginx::upstream (
   $content = "",
   $indention = "    ",
 ) {
-  include nginx::base
-
   if $ensure == present {
     concat { "$server_config_file_name":
       owner => $server_config_owner,
@@ -19,11 +17,11 @@ define nginx::upstream (
       order => 'alpha',
     }
 
-   if defined(Service['nginx']) {
-    Concat["$server_config_file_name"] {
-      notify => Service['nginx']
+    if defined(Service['nginx']) {
+      Concat["$server_config_file_name"] {
+        notify => Service['nginx']
+      }
     }
-   }
 
     concat::fragment{ "${server_config_file_name}_header":
       target => $server_config_file_name,
@@ -31,24 +29,24 @@ define nginx::upstream (
       order => '001+'
     }
 
-  if $content != "" {
-    $content_with_indention = regsubst($content, "^(.*)$", "${indention}\\1", "G")
-    concat::fragment{ "${server_config_file_name}_body":
-      ensure => $ensure,
-      target => $server_config_file_name,
-      content => "\n${content_with_indention}",
-      order => "025+",
+    if $content != "" {
+      $content_with_indention = regsubst($content, "^(.*)$", "${indention}\\1", "G")
+      concat::fragment{ "${server_config_file_name}_body":
+        ensure => $ensure,
+        target => $server_config_file_name,
+        content => "\n${content_with_indention}",
+        order => "025+",
+      }
     }
-  }
 
-  concat::fragment{ "${server_config_file_name}_footer":
+    concat::fragment{ "${server_config_file_name}_footer":
       target => $server_config_file_name,
       content => regsubst(template($server_config_footer_template), "^(.*)$", "\\1", "G"),
       order => '999+'
     }
   } else {
-     file { "$server_config_file_name":
-       ensure => absent
-     }
+    file { "$server_config_file_name":
+      ensure => absent
+    }
   }
 }
